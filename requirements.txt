@@ -1,0 +1,4 @@
+tqdm
+xxhash
+PyQt6
+PyQt6-WebEngine
