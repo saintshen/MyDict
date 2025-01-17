@@ -79,7 +79,7 @@ class MyDict(QMainWindow):
         value = self.search_input.text()
         record = reader.query('.dict/LDOCE6.mdx', value)
         CURRENT_DIRECTORY = Path(__file__).resolve().parent
-        filename = os.fspath(CURRENT_DIRECTORY / ".dict/temp.html")
+        filename = os.fspath(CURRENT_DIRECTORY / ".dict/data/entry.html")
         url = QUrl.fromLocalFile(filename)
         with open(filename, 'w', encoding='utf-8') as file:
             file.write(record)
