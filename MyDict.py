@@ -1,9 +1,11 @@
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLineEdit, QLabel
 from PyQt6.QtGui import QIcon
-from PyQt6.QtCore import Qt, QPoint
+from PyQt6.QtCore import Qt, QPoint, QUrl
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 import sys
+import os
 import reader
+from pathlib import Path
 
 
 class MyDict(QMainWindow):
@@ -76,9 +78,14 @@ class MyDict(QMainWindow):
     def search(self):
         value = self.search_input.text()
         record = reader.query('.dict/LDOCE6.mdx', value)
-        self.webview.setHtml(record)
-        self.webview.show()
-    
+        CURRENT_DIRECTORY = Path(__file__).resolve().parent
+        filename = os.fspath(CURRENT_DIRECTORY / ".dict/temp.html")
+        url = QUrl.fromLocalFile(filename)
+        with open(filename, 'w', encoding='utf-8') as file:
+            file.write(record)
+        self.webview.load(url)
+        
+   
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MyDict()
