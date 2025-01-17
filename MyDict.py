@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLineEdit, QLabel
+from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLineEdit, QLabel, QDialog
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt, QPoint, QUrl
 from PyQt6.QtWebEngineWidgets import QWebEngineView
@@ -8,12 +8,12 @@ import reader
 from pathlib import Path
 
 
-class MyDict(QMainWindow):
+class SearchBar(QMainWindow):
     def __init__(self):
         super().__init__()
         
         self.setWindowTitle("MyDict")
-        self.resize(500, 500)
+        self.resize(120, 32)
         self.setWindowOpacity(0.4)
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
@@ -23,21 +23,15 @@ class MyDict(QMainWindow):
         central_widget.setObjectName("Container")
         central_widget.setStyleSheet("""#Container {
             background: qlineargradient(x1:0 y1:0, x2:1 y2:1, stop:0 #051c2a stop:1 #44315f);
-            border-radius: 20px;
+            border-radius: 10px;
         }""")
         self.search_input = QLineEdit(self)
         self.search_input.returnPressed.connect(self.search)
-        self.webview = QWebEngineView()
         
-        work_space_layout = QVBoxLayout()
-        # work_space_layout.setContentsMargins(11, 11, 11, 11)
-        work_space_layout.addWidget(self.webview)
         
         centra_widget_layout = QVBoxLayout()
-        centra_widget_layout.setContentsMargins(10,10,10,10)
-        # centra_widget_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        centra_widget_layout.setContentsMargins(10,6,10,6)
         centra_widget_layout.addWidget(self.search_input)
-        centra_widget_layout.addLayout(work_space_layout)
         
         central_widget.setLayout(centra_widget_layout)
         self.setCentralWidget(central_widget)
@@ -83,11 +77,26 @@ class MyDict(QMainWindow):
         url = QUrl.fromLocalFile(filename)
         with open(filename, 'w', encoding='utf-8') as file:
             file.write(record)
-        self.webview.load(url)
         
+        # self.webview.load(url)
+        viewer = DictViewer(self, url)
+        viewer.exec()
+ 
+class DictViewer(QDialog):
+    def __init__(self, parent=None, url=None):
+        super().__init__(parent)
+        self.setWindowIcon(QIcon("assets/dictionary.svg"))
+        self.setWindowTitle("MyDict")
+        self.view = QWebEngineView()
+        layout = QVBoxLayout()
+        layout.addWidget(self.view)
+        self.setLayout(layout)
+        self.resize(800, 600)
+        if url:
+            self.view.load(url)       
    
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = MyDict()
+    window = SearchBar()
     window.show()
     app.exec()
