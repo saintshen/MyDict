@@ -1,11 +1,14 @@
-from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLineEdit, QLabel, QDialog
+from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLineEdit, QDialog
 from PyQt6.QtGui import QIcon
-from PyQt6.QtCore import Qt, QPoint, QUrl
-from PyQt6.QtWebEngineWidgets import QWebEngineView
+from PyQt6.QtCore import Qt, QUrl
+
 import sys
 import os
 import reader
 from pathlib import Path
+from PyQt6.QtWebEngineWidgets import QWebEngineView
+from PyQt6.QtWebEngineCore import QWebEnginePage
+from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 
 
 class SearchBar(QMainWindow):
@@ -88,12 +91,37 @@ class DictViewer(QDialog):
         self.setWindowIcon(QIcon("assets/dictionary.svg"))
         self.setWindowTitle("MyDict")
         self.view = QWebEngineView()
+        self.view.setPage(CustomWebEnginePage(self))
         layout = QVBoxLayout()
         layout.addWidget(self.view)
         self.setLayout(layout)
         self.resize(800, 600)
         if url:
             self.view.load(url)       
+
+class CustomWebEnginePage(QWebEnginePage):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        
+    def acceptNavigationRequest(self, url, type, isMainFrame):
+        print(type)
+        if type == QWebEnginePage.NavigationType.NavigationTypeLinkClicked:
+            if url.scheme() == "sound":
+                print(url.path())
+                
+                player = self.play_sound(".dict/data/" + url.host() + url.path())
+                player.play()
+            return False
+        return super().acceptNavigationRequest(url, type, isMainFrame)
+    
+    def play_sound(self, audio_file):
+        self.player = QMediaPlayer()
+        self.audio_output = QAudioOutput()
+        self.player.setAudioOutput(self.audio_output)
+        print(audio_file)
+        self.player.setSource(QUrl.fromLocalFile(audio_file))
+        self.audio_output.setVolume(50)
+        return self.player
    
 if __name__ == "__main__":
     app = QApplication(sys.argv)
