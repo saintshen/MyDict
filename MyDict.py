@@ -1,11 +1,11 @@
-from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLineEdit, QDialog
-from PyQt6.QtGui import QIcon
-from PyQt6.QtCore import Qt, QUrl
 
 import sys
 import os
 import reader
 from pathlib import Path
+from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLineEdit, QDialog
+from PyQt6.QtGui import QIcon
+from PyQt6.QtCore import Qt, QUrl
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWebEngineCore import QWebEnginePage
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
@@ -76,7 +76,7 @@ class SearchBar(QMainWindow):
         value = self.search_input.text()
         record = reader.query('.dict/LDOCE6.mdx', value)
         CURRENT_DIRECTORY = Path(__file__).resolve().parent
-        filename = os.fspath(CURRENT_DIRECTORY / ".dict/data/entry.html")
+        filename = os.fspath(CURRENT_DIRECTORY / ".dict/data/word.html")
         url = QUrl.fromLocalFile(filename)
         with open(filename, 'w', encoding='utf-8') as file:
             file.write(record)
@@ -107,10 +107,18 @@ class CustomWebEnginePage(QWebEnginePage):
         print(type)
         if type == QWebEnginePage.NavigationType.NavigationTypeLinkClicked:
             if url.scheme() == "sound":
-                print(url.path())
-                
                 player = self.play_sound(".dict/data/" + url.host() + url.path())
                 player.play()
+            if url.scheme() == "entry":
+                entry_file = url.host()
+                record = reader.query('.dict/LDOCE6.mdx', '@' + entry_file)
+                CURRENT_DIRECTORY = Path(__file__).resolve().parent
+                filename = os.fspath(CURRENT_DIRECTORY / ".dict/data/entry.html")
+                entry_url = QUrl.fromLocalFile(filename)
+                with open(filename, 'w', encoding='utf-8') as file:
+                    file.write(record)
+                self.parent().view.load(entry_url)
+            
             return False
         return super().acceptNavigationRequest(url, type, isMainFrame)
     
