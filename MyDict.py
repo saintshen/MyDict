@@ -1,6 +1,5 @@
 
-import sys
-import os
+import sys, os
 import reader
 from pathlib import Path
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLineEdit, QDialog
@@ -10,6 +9,14 @@ from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWebEngineCore import QWebEnginePage
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 
+basedir = os.path.dirname(__file__)
+
+try:
+    from ctypes import windll  # Only exists on Windows.
+    myappid = 'com.hs-labs.mydict.1'
+    windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+except ImportError:
+    pass
 
 class SearchBar(QMainWindow):
     def __init__(self):
@@ -88,7 +95,7 @@ class SearchBar(QMainWindow):
 class DictViewer(QDialog):
     def __init__(self, parent=None, url=None):
         super().__init__(parent)
-        self.setWindowIcon(QIcon("assets/dictionary.svg"))
+        self.setWindowIcon(QIcon(os.path.join(basedir, "dictionary.ico")))
         self.setWindowTitle("MyDict")
         self.view = QWebEngineView()
         self.view.setPage(CustomWebEnginePage(self))
@@ -133,6 +140,7 @@ class CustomWebEnginePage(QWebEnginePage):
    
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon(os.path.join(basedir, "dictionary.ico")))
     window = SearchBar()
     window.show()
     app.exec()
