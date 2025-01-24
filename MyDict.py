@@ -95,7 +95,7 @@ class SearchBar(QMainWindow):
 class DictViewer(QDialog):
     def __init__(self, parent=None, url=None):
         super().__init__(parent)
-        self.setWindowIcon(QIcon(os.path.join(basedir, "dictionary.ico")))
+        self.setWindowIcon(QIcon(os.path.join(basedir, "assets", "dictionary.svg")))
         self.setWindowTitle("MyDict")
         self.view = QWebEngineView()
         self.view.setPage(CustomWebEnginePage(self))
@@ -140,7 +140,7 @@ class CustomWebEnginePage(QWebEnginePage):
    
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon(os.path.join(basedir, "dictionary.ico")))
+    app.setWindowIcon(QIcon(os.path.join(basedir, "assets", "dictionary.ico")))
     window = SearchBar()
     window.show()
     app.exec()
